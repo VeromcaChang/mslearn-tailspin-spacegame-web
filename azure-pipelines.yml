@@ -55,3 +55,11 @@ steps:
     publishWebProjects: false
     projects: '**/*.csproj'
     arguments: '--no-build -c Release --output $(Build.ArtifactStagingDirectory)/Release'
+
+- task: PublishBuildArtifacts@1
+  displayName: "Publish Artifact: drop"
+  condition: succeeded()
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
