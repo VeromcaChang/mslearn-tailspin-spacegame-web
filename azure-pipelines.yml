@@ -17,11 +17,12 @@ steps:
   inputs:
     version: '$(dotnetSdkVersion)'
 
-# - task: UseDotNet@2
-#   displayName: 'Use .NET Core SDK 2.1.505 for SonarCloud'
-#   inputs:
-#     packageType: 'sdk'
-#     version: '2.1.505'
+# Azure Pipeline SonarCloud extensions require .NET Core SDK 2.1
+- task: UseDotNet@2
+  displayName: 'Use .NET Core SDK 2.1.505 for SonarCloud'
+  inputs:
+    packageType: 'sdk'
+    version: '2.1.505'
 
 - task: Npm@1
   displayName: 'Run npm install'
@@ -56,6 +57,13 @@ steps:
     extraProperties: |
       sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/TestResults/Coverage/coverage.opencover.xml
       sonar.exclusions=**/wwwroot/lib/**/*
+  condition: |
+    and
+    (
+      succeeded(),
+      eq(variables['Build.Reason'], 'PullRequest'),
+      eq(variables['System.PullRequest.TargetBranch'], 'master')
+    )
 
 - task: DotNetCoreCLI@2
   displayName: 'Build the project - $(buildConfiguration)'
@@ -85,11 +93,25 @@ steps:
 
 - task: SonarCloudAnalyze@1
   displayName: 'Run SonarCloud code analysis'
+  condition: |
+    and
+    (
+      succeeded(),
+      eq(variables['Build.Reason'], 'PullRequest'),
+      eq(variables['System.PullRequest.TargetBranch'], 'master')
+    )
 
 - task: SonarCloudPublish@1
   displayName: 'Publish SonarCloud quality gate results'
   inputs:
     pollingTimeoutSec: '2000'
+  condition: |
+    and
+    (
+      succeeded(),
+      eq(variables['Build.Reason'], 'PullRequest'),
+      eq(variables['System.PullRequest.TargetBranch'], 'master')
+    )
 
 - task: PublishCodeCoverageResults@1
   displayName: 'Publish code coverage report'
