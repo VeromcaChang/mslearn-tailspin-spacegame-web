@@ -1,6 +1,9 @@
 trigger:
-- 'master'
-- releases/*
+  batch: true
+  branches:
+    include:
+    - 'master'
+    - releases/*
 
 
 pool:
