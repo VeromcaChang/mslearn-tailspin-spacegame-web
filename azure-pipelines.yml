@@ -1,9 +1,13 @@
-trigger:
-  batch: true
+# trigger:
+#   batch: true
+#   branches:
+#     include:
+#     - 'master'
+#     - releases/*
+pr:
   branches:
     include:
-    - 'master'
-    - releases/*
+    - 'master'  # must quote since "*" is a YAML reserved character; we want a string
 
 
 pool:
